@@ -1,1 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expedição Interativa: Ao Norte do Norte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Arctic Dawn -->
+    <!-- Application Structure Plan: A single-page application structured as an expedition log. The user flow is guided vertically through thematic sections: 1. 'A Missão' introduces the narrative and crew via interactive cards. 2. 'Diário de Bordo' acts as the core interactive hub, using a tabbed interface for the three disciplines (Linguagem, Matemática, Química), allowing non-linear exploration of challenges. 3. 'A Grande Revelação' synthesizes the learning, unveiling the core allegory of ocean acidification with a powerful data visualization. This structure was chosen to transform the linear PDF into an exploratory experience, promoting active learning and engagement by focusing on user interaction within clear, purpose-driven sections, which is more effective for digital consumption than a simple chapter-by-chapter replica. -->
+    <!-- Visualization & Content Choices: Report Info: Crew members -> Goal: Introduce -> Viz: Interactive HTML/CSS cards -> Interaction: Hover/Click to reveal details -> Justification: More engaging than a static list. Report Info: Math problems (iceberg/cave height) -> Goal: Apply formulas -> Viz: HTML/CSS diagram + input fields -> Interaction: User inputs values, JS calculates and displays results instantly -> Justification: Turns passive problems into an active calculator tool. Report Info: pH experiment -> Goal: Understand acids/bases -> Viz: Simulated beaker (HTML/CSS) and pH scale -> Interaction: User clicks substances, JS changes color and updates scale -> Justification: Provides a safe, repeatable, and visually intuitive simulation of the lab experiment. Report Info: Ocean acidification concept -> Goal: Show change over time -> Viz: Chart.js Line Chart -> Interaction: Hover over points to see data -> Justification: A powerful, data-driven visualization that makes the abstract concept of climate change tangible and impactful. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        h1, h2, h3 {
+            font-family: 'Lora', serif;
+        }
+        .chart-container {
+            position: relative;
+            height: 45vh;
+            max-height: 450px;
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .tab-btn.active {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-700">Ao Norte do Norte</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#missao" class="nav-link text-gray-600 hover:text-blue-500">A Missão</a>
+                <a href="#diario" class="nav-link text-gray-600 hover:text-blue-500">Diário de Bordo</a>
+                <a href="#revelacao" class="nav-link text-gray-600 hover:text-blue-500">A Grande Revelação</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4">
+            <a href="#missao" class="block py-2 text-gray-600 hover:text-blue-500">A Missão</a>
+            <a href="#diario" class="block py-2 text-gray-600 hover:text-blue-500">Diário de Bordo</a>
+            <a href="#revelacao" class="block py-2 text-gray-600 hover:text-blue-500">A Grande Revelação</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="missao" class="text-center my-12 scroll-mt-20">
+            <h2 class="text-4xl font-bold mb-4 text-gray-800">A Missão Começa</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-8">
+                Bem-vindo, aventureiro. No extremo norte do mundo, um mistério aguarda. Dizem que monstros não apenas existem... eles esperam. Não para atacar, mas para serem compreendidos. A sua jornada não é de conquista, mas de descoberta. Prepare-se, pois aqui mapas serão redesenhados e conceitos, desafiados.
+            </p>
+            <h3 class="text-3xl font-bold mb-6 text-gray-700">Conheça a Tripulação</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:scale-105 transition-transform">
+                    <div class="text-5xl mb-3">🧭</div>
+                    <h4 class="text-xl font-semibold mb-2">Lina, a Cronista</h4>
+                    <p class="text-gray-600">Com pena e pergaminho, ela regista a jornada, dando forma e sentido à experiência da tripulação.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:scale-105 transition-transform">
+                    <div class="text-5xl mb-3">🦉</div>
+                    <h4 class="text-xl font-semibold mb-2">Lua, a Comunicadora</h4>
+                    <p class="text-gray-600">Intérprete da natureza, ela compreende os sinais que outros não veem, guiando a equipe com empatia.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:scale-105 transition-transform">
+                     <div class="text-5xl mb-3">📐</div>
+                    <h4 class="text-xl font-semibold mb-2">Tomi, o Matemático</h4>
+                    <p class="text-gray-600">Para ele, o mundo é um mapa de ângulos e distâncias, e a lógica é a bússola para navegar no caos.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center transform hover:scale-105 transition-transform">
+                     <div class="text-5xl mb-3">🧪</div>
+                    <h4 class="text-xl font-semibold mb-2">Anara, a Cientista</h4>
+                    <p class="text-gray-600">Com seu diário e ferramentas, ela segue o método científico: observar, hipotetizar e experimentar.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="diario" class="my-16 scroll-mt-20">
+            <h2 class="text-4xl font-bold text-center mb-8 text-gray-800">Diário de Bordo: Desafios da Expedição</h2>
+             <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-10 text-center">
+                A jornada "Ao Norte do Norte" está repleta de enigmas que testarão as suas habilidades. Cada desafio resolvido nos aproxima da verdade sobre o Monstro Glacial. Explore os desafios de cada disciplina para desvendar os segredos da expedição.
+            </p>
+            <div class="bg-white rounded-lg shadow-xl p-4 sm:p-8">
+                <div class="border-b border-gray-200 mb-6">
+                    <nav class="-mb-px flex space-x-4 sm:space-x-8 justify-center" aria-label="Tabs">
+                        <button class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600" data-tab="linguagem">
+                            Desafio de Linguagem
+                        </button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="matematica">
+                            Desafio de Matemática
+                        </button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="quimica">
+                            Desafio de Química
+                        </button>
+                    </nav>
+                </div>
+
+                <div id="tab-content">
+                    <div id="linguagem" class="tab-pane active">
+                        <h3 class="text-2xl font-semibold mb-4 text-center">Desvendando Mensagens</h3>
+                        <div class="space-y-8">
+                            <div class="p-6 border rounded-lg bg-slate-50">
+                                <h4 class="text-xl font-semibold mb-2">Fato vs. Opinião: O Mistério do Yeti</h4>
+                                <p class="mb-4 text-gray-600">A tripulação encontrou uma notícia antiga sobre o "Abominável Homem das Neves". O cientista Bryan Sykes disse: <br><i class="text-gray-700">"Encontramos uma coincidência genética exata entre as amostras do Yeti e o DNA de um antigo urso polar. Não acredito que signifique que há ursos polares primitivos rondando pelo Himalaia. Uma explicação mais provável é que se trate de um híbrido."</i><br>Clique nas partes da citação para classificá-las.</p>
+                                <p class="text-center">
+                                    <span id="fato-opiniao-q1" class="cursor-pointer p-1 rounded transition-colors duration-300 hover:bg-blue-100">"coincidência genética exata"</span> é um(a) <span class="font-bold" id="fato-opiniao-a1">?</span>. 
+                                    <span id="fato-opiniao-q2" class="cursor-pointer p-1 rounded transition-colors duration-300 hover:bg-blue-100">"Não acredito que..."</span> é um(a) <span class="font-bold" id="fato-opiniao-a2">?</span>.
+                                </p>
+                                <div id="feedback-fo" class="mt-2 text-center font-medium"></div>
+                            </div>
+                             <div class="p-6 border rounded-lg bg-slate-50">
+                                <h4 class="text-xl font-semibold mb-2">O Ritmo da Prosa: Polissíndeto e Assíndeto</h4>
+                                <p class="mb-4 text-gray-600">A forma como escrevemos muda tudo. O uso de conjunções (e, nem, mas, ou) pode acelerar ou retardar a leitura. Observe os exemplos e sinta a diferença no ritmo.</p>
+                                <div class="grid md:grid-cols-2 gap-4 text-center">
+                                    <div>
+                                        <p class="font-semibold">Exemplo 1 (Assíndeto)</p>
+                                        <p class="italic p-3 bg-white rounded">"Vim, vi, venci."</p>
+                                        <p class="text-sm mt-1 text-gray-500">Omite conjunções, criando urgência.</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold">Exemplo 2 (Polissíndeto)</p>
+                                        <p class="italic p-3 bg-white rounded">"E chove, e neva, e venta."</p>
+                                        <p class="text-sm mt-1 text-gray-500">Repete conjunções, criando ênfase.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="matematica" class="tab-pane hidden">
+                        <h3 class="text-2xl font-semibold mb-4 text-center">Calculando o Desconhecido</h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="p-6 border rounded-lg bg-slate-50">
+                                <h4 class="text-xl font-semibold mb-2">O Enigma do Iceberg</h4>
+                                <p class="mb-4 text-gray-600">Para seguir a trilha, a tripulação precisa saber a altura de um iceberg. As distâncias até a base formam um triângulo retângulo com catetos de 600m e 800m. Calcule a altura (h) relativa à hipotenusa.</p>
+                                <div class="w-full h-32 my-4 bg-blue-100 border-2 border-blue-300 border-dashed rounded-md flex items-center justify-center relative">
+                                  <div class="text-blue-800 font-mono">Diagrama do Iceberg</div>
+                                  <div class="absolute bottom-2 left-2 text-sm">c = 600m</div>
+                                  <div class="absolute top-2 right-2 text-sm transform -rotate-45">b = 800m</div>
+                                </div>
+                                <button id="calc-iceberg" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition-colors">Calcular Altura do Iceberg</button>
+                                <p id="resultado-iceberg" class="mt-4 text-center text-lg font-bold"></p>
+                            </div>
+                            <div class="p-6 border rounded-lg bg-slate-50">
+                                <h4 class="text-xl font-semibold mb-2">A Medida do Monstro</h4>
+                                <p class="mb-4 text-gray-600">A entrada da caverna do monstro é um triângulo. As projeções dos catetos na hipotenusa são 4m e 6m. Qual a altura (h) da caverna?</p>
+                                 <div class="w-full h-32 my-4 bg-blue-100 border-2 border-blue-300 border-dashed rounded-md flex items-center justify-center relative">
+                                  <div class="text-blue-800 font-mono">Diagrama da Caverna</div>
+                                  <div class="absolute bottom-2 left-1/4 text-sm">m = 4m</div>
+                                  <div class="absolute bottom-2 right-1/4 text-sm">n = 6m</div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <input type="number" id="proj-m" class="w-1/2 p-2 border rounded" placeholder="Projeção m (4)">
+                                    <input type="number" id="proj-n" class="w-1/2 p-2 border rounded" placeholder="Projeção n (6)">
+                                </div>
+                                <button id="calc-caverna" class="mt-2 w-full bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition-colors">Calcular Altura da Caverna</button>
+                                <p id="resultado-caverna" class="mt-4 text-center text-lg font-bold"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="quimica" class="tab-pane hidden">
+                        <h3 class="text-2xl font-semibold mb-4 text-center">A Química do Mistério</h3>
+                        <p class="max-w-2xl mx-auto text-center text-gray-600 mb-6">Na "Caverna das Fumaças Ácidas", Anara usou a ciência para investigar. Agora é a sua vez. Teste substâncias com um indicador de repolho roxo virtual e descubra suas propriedades.</p>
+                        <div class="grid md:grid-cols-3 gap-6 items-center">
+                            <div class="md:col-span-1 flex flex-col items-center">
+                                <h4 class="text-lg font-semibold mb-2">Simulador de pH</h4>
+                                <div id="beaker" class="w-32 h-40 border-4 border-gray-400 rounded-b-xl flex items-end transition-colors duration-500" style="background-color: #a8a2d3;">
+                                    <div id="liquid" class="w-full h-3/4 transition-colors duration-500" style="background-color: #a8a2d3;"></div>
+                                </div>
+                                <p id="substance-name" class="mt-2 font-bold text-lg">Repolho Roxo</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <h4 class="text-lg font-semibold mb-3 text-center">Selecione uma substância para testar:</h4>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    <button class="chem-btn p-3 bg-white border rounded-lg hover:bg-slate-100" data-ph="2.4" data-color="#ff4d4d" data-name="Sumo de Limão">Sumo de Limão</button>
+                                    <button class="chem-btn p-3 bg-white border rounded-lg hover:bg-slate-100" data-ph="2.9" data-color="#ff8c66" data-name="Vinagre">Vinagre</button>
+                                    <button class="chem-btn p-3 bg-white border rounded-lg hover:bg-slate-100" data-ph="7.0" data-color="#d3d3d3" data-name="Água Pura">Água Pura</button>
+                                    <button class="chem-btn p-3 bg-white border rounded-lg hover:bg-slate-100" data-ph="8.2" data-color="#99ccff" data-name="Água do Mar">Água do Mar</button>
+                                    <button class="chem-btn p-3 bg-white border rounded-lg hover:bg-slate-100" data-ph="9.0" data-color="#66b266" data-name="Bic. de Sódio">Bic. de Sódio</button>
+                                    <button class="chem-btn p-3 bg-white border rounded-lg hover:bg-slate-100" data-ph="12.5" data-color="#ffff66" data-name="Água Sanitária">Água Sanitária</button>
+                                </div>
+                                 <div class="mt-4 p-4 bg-slate-50 rounded-lg">
+                                    <p class="text-center">O pH da substância é: <span id="ph-value" class="font-bold text-xl text-blue-600">7.0</span></p>
+                                    <p class="text-center text-sm text-gray-500">(pH < 7 é Ácido, pH > 7 é Básico, pH = 7 é Neutro)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="revelacao" class="my-20 scroll-mt-20">
+            <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">A Grande Revelação</h2>
+            <p class="max-w-3xl mx-auto text-lg text-center text-gray-600 mb-8">
+                Após todos os desafios, a tripulação chega ao coração do mistério. O "Monstro Glacial" não é uma criatura, mas um fenómeno. As anotações de Anara revelam a verdade: a química da caverna é uma alegoria para um problema real e global.
+            </p>
+            <div class="bg-white rounded-lg shadow-xl p-4 md:p-8">
+                <p class="text-center italic text-xl text-gray-700 mb-8 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">"O monstro é um processo... um organismo que se molda com reações químicas. Nossa melhor arma não é a força, mas o entendimento das reações que o definem." - Diário de Anara</p>
+                <h3 class="text-3xl font-semibold text-center mb-2">O Monstro é a Acidificação dos Oceanos</h3>
+                <p class="text-center text-gray-600 mb-6">O excesso de dióxido de carbono ($CO_2$) na atmosfera, causado pela atividade humana, dissolve-se na água do mar. Essa reação torna os oceanos mais ácidos, ameaçando a vida marinha.</p>
+                <div class="text-center font-mono text-xl p-4 bg-gray-800 text-white rounded-md my-4">
+                    $CO_2$ (Dióxido de Carbono) + $H_2O$ (Água) → $H_2CO_3$ (Ácido Carbónico)
+                </div>
+                <p class="text-center text-gray-600 mb-8">Este gráfico mostra a perigosa correlação entre o aumento de $CO_2$ na atmosfera e a queda do pH dos oceanos ao longo do tempo. Explore os dados para entender a escala do desafio.</p>
+                <div class="chart-container">
+                    <canvas id="acidificationChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center py-6">
+        <p>&copy; 2025 Elaria Companhia de Exploradores. Uma adaptação interativa do Desafio 05 - 9º Ano.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (link.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        const targetId = link.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                            if (!mobileMenu.classList.contains('hidden')) {
+                                mobileMenu.classList.add('hidden');
+                            }
+                        }
+                    }
+                });
+            });
+
+            const tabs = document.querySelectorAll('.tab-btn');
+            const panes = document.querySelectorAll('.tab-pane');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(item => {
+                        item.classList.remove('active');
+                        item.classList.remove('text-blue-600', 'border-blue-500');
+                        item.classList.add('text-gray-500', 'border-transparent');
+                    });
+                    tab.classList.add('active');
+                    tab.classList.add('text-blue-600', 'border-blue-500');
+                    tab.classList.remove('text-gray-500', 'border-transparent');
+                    
+                    const target = tab.getAttribute('data-tab');
+                    panes.forEach(pane => {
+                        if (pane.id === target) {
+                            pane.classList.remove('hidden');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            const q1 = document.getElementById('fato-opiniao-q1');
+            const q2 = document.getElementById('fato-opiniao-q2');
+            const a1 = document.getElementById('fato-opiniao-a1');
+            const a2 = document.getElementById('fato-opiniao-a2');
+            const feedbackFO = document.getElementById('feedback-fo');
+
+            q1.addEventListener('click', () => {
+                a1.textContent = 'FATO';
+                a1.classList.add('text-green-600');
+                q1.classList.add('bg-green-100');
+                checkFatoOpiniao();
+            });
+
+            q2.addEventListener('click', () => {
+                a2.textContent = 'OPINIÃO';
+                a2.classList.add('text-green-600');
+                q2.classList.add('bg-green-100');
+                checkFatoOpiniao();
+            });
+
+            function checkFatoOpiniao() {
+                if (a1.textContent === 'FATO' && a2.textContent === 'OPINIÃO') {
+                    feedbackFO.textContent = 'Correto! Fatos são verificáveis, enquanto opiniões são interpretações.';
+                    feedbackFO.classList.add('text-green-600');
+                }
+            }
+
+            const calcIcebergBtn = document.getElementById('calc-iceberg');
+            const resultadoIceberg = document.getElementById('resultado-iceberg');
+            calcIcebergBtn.addEventListener('click', () => {
+                const c = 600;
+                const b = 800;
+                const a = Math.sqrt(c*c + b*b); 
+                const h = (b * c) / a;
+                resultadoIceberg.textContent = `A altura (h) do iceberg é ${h.toFixed(2)} metros.`;
+            });
+            
+            const calcCavernaBtn = document.getElementById('calc-caverna');
+            const resultadoCaverna = document.getElementById('resultado-caverna');
+            const projM = document.getElementById('proj-m');
+            const projN = document.getElementById('proj-n');
+            calcCavernaBtn.addEventListener('click', () => {
+                const m = parseFloat(projM.value) || 4;
+                const n = parseFloat(projN.value) || 6;
+                if (m > 0 && n > 0) {
+                   const h = Math.sqrt(m * n);
+                   resultadoCaverna.textContent = `A altura (h) da caverna é ${h.toFixed(2)} metros.`;
+                } else {
+                   resultadoCaverna.textContent = `Por favor, insira valores válidos.`;
+                }
+            });
+
+            const chemBtns = document.querySelectorAll('.chem-btn');
+            const beaker = document.getElementById('beaker');
+            const liquid = document.getElementById('liquid');
+            const phValue = document.getElementById('ph-value');
+            const substanceName = document.getElementById('substance-name');
+
+            chemBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const ph = btn.getAttribute('data-ph');
+                    const color = btn.getAttribute('data-color');
+                    const name = btn.getAttribute('data-name');
+                    
+                    liquid.style.backgroundColor = color;
+                    beaker.style.borderColor = color;
+                    beaker.style.boxShadow = `0 0 15px ${color}`;
+                    phValue.textContent = ph;
+                    substanceName.textContent = name;
+
+                    if (parseFloat(ph) < 7) phValue.style.color = '#ff4d4d';
+                    else if (parseFloat(ph) > 7) phValue.style.color = '#3b82f6';
+                    else phValue.style.color = '#333';
+                });
+            });
+
+            const ctx = document.getElementById('acidificationChart').getContext('2d');
+            const acidificationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1880', '1900', '1920', '1940', '1960', '1980', '2000', '2020', '2040 (Proj.)'],
+                    datasets: [{
+                        label: 'pH Médio do Oceano',
+                        data: [8.18, 8.16, 8.14, 8.12, 8.10, 8.08, 8.06, 8.04, 8.02],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        yAxisID: 'y',
+                        tension: 0.1,
+                        fill: true
+                    }, {
+                        label: 'CO2 Atmosférico (ppm)',
+                        data: [290, 295, 305, 310, 317, 338, 369, 414, 450],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Aumento do CO2 vs. Diminuição do pH do Oceano (1880-2040)',
+                            font: { size: 16 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + (context.dataset.yAxisID === 'y1' ? ' ppm' : '');
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Ano'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'pH do Oceano'
+                            },
+                            suggestedMin: 8.0,
+                            suggestedMax: 8.2
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                             title: {
+                                display: true,
+                                text: 'CO2 (ppm)'
+                            },
+                            grid: {
+                                drawOnChartArea: false, 
+                            },
+                            suggestedMin: 280,
+                            suggestedMax: 460
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
 
